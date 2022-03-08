@@ -1,1 +1,1 @@
-# ltnc-btl
+try to memorize as much as possible
