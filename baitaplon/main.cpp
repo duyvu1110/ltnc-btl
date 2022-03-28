@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     initSDL(window, renderer, WINDOW_TITLE, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     Game game(renderer);
-    Event event = UP;
+    Event event= UP;
 
     while ( ! game.isOver()) {
             getEvent(event);

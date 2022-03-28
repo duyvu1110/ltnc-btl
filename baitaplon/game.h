@@ -13,7 +13,7 @@ const int Y_STEP[] = {1 ,    -1,  0,  0 };
 
 struct Game{
     Box box;
-    Box box2;
+//    Box box2;
     int score = 0;
     SDL_Renderer* renderer;
 
@@ -27,8 +27,8 @@ struct Game{
         box.x = SCREEN_WIDTH / 2;
         box.y = SCREEN_HEIGHT / 2;
 
-        box2.x = 100;
-        box2.y = 100;
+//        box2.x = 100;
+//        box2.y = 100;
      }
 
     bool isOver() {
@@ -37,14 +37,14 @@ struct Game{
 
     void update(Event event) {
         box.move(X_STEP[event] * STEP, Y_STEP[event] * STEP);
-        box2.move(1,1);
+//        box2.move(1,1);
         score++;
     }
 
     void draw()
     {
         box.draw(renderer);
-        box2.draw(renderer);
+//        box2.draw(renderer);
         SDL_RenderPresent(renderer);
     }
 };
