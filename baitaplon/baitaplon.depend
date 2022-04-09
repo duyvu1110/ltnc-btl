@@ -1,29 +1,32 @@
 # depslib dependency file v1.0
-1648483681 source:d:\1\programming\ltnc-btl\baitaplon\main.cpp
+1649342960 source:d:\1\programming\ltnc-btl\baitaplon\main.cpp
 	<iostream>
 	<SDL.h>
 	"utils.h"
-	"game.h"
 	"params.h"
+	<SDL_image.h>
+	"box.h"
+	"game.h"
 
 1648481161 d:\1\programming\ltnc-btl\baitaplon\utils.h
 	<iostream>
 	<SDL.h>
 
-1648483750 d:\1\programming\ltnc-btl\baitaplon\game.h
-	<iostream>
-	<SDL.h>
-	"params.h"
-	"box.h"
-
-1648481492 d:\1\programming\ltnc-btl\baitaplon\params.h
-
-1648481378 d:\1\programming\ltnc-btl\baitaplon\box.h
+1649340723 d:\1\programming\ltnc-btl\baitaplon\game.h
 	<iostream>
 	<SDL.h>
 
-1648481324 source:d:\1\programming\ltnc-btl\baitaplon\utils.cpp
+1649342979 d:\1\programming\ltnc-btl\baitaplon\params.h
+
+1649342806 d:\1\programming\ltnc-btl\baitaplon\box.h
+	<iostream>
+	<SDL.h>
+
+1649259933 source:d:\1\programming\ltnc-btl\baitaplon\utils.cpp
 	<iostream>
 	<SDL.h>
 	"utils.h"
+
+1648565424 d:\1\programming\ltnc-btl\baitaplon\fruits.h
+	<SDL.h>
 
