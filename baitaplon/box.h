@@ -14,9 +14,6 @@ struct Plane {
     float dx;
     float dy;
     int health;
-    int w;
-    int h;
-    int reload;
     SDL_Texture* texture;
 };
 

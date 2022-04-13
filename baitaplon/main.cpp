@@ -11,6 +11,7 @@ SDL_Renderer *renderer;
 SDL_Window *window;
 Plane player;
 Plane bullet;
+Plane enemy;
 game app;
 void Screen(){
     SDL_SetRenderDrawColor(renderer,96,128 ,255,255);
@@ -144,6 +145,17 @@ void Framerate(long *a,float* remainder){
 
 	*a = SDL_GetTicks();
 }
+void spawnenemy(Plane enemy){
+    if(enemy.health!=0){
+         blit(enemy.texture,enemy.x,enemy.y);
+    }else{
+    enemy.health=1;
+    enemy.x=rand()% SCREEN_WIDTH/2;
+    enemy.y=rand()% SCREEN_HEIGHT/2;
+    blit(enemy.texture,enemy.x,enemy.y);
+    }
+}
+
 int main(int argc,char* argv[])
 {
     IMG_Init(IMG_INIT_PNG);
@@ -156,13 +168,17 @@ int main(int argc,char* argv[])
 	player.y = 50;
 	player.texture = loadTexture("player1.png");
 	bullet.texture = loadTexture("bullet.png");
+	enemy.texture= loadTexture("player1.png");
+	enemy.health=1;
+//	spawnenemy(enemy);
     while(true){
         Screen();
+        spawnenemy(enemy);
+
         doInput();
         player.x += player.dx;
 		player.y += player.dy;
-
-		if (app.up)
+        if (app.up)
 		{
 			player.y -= PLAYER_SPEED;
 		}
