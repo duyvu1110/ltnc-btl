@@ -9,10 +9,12 @@ using namespace std;
 const int RECT_SIZE = 30;
 
 struct Plane {
-   float x;
-    float y;
-    float dx;
-    float dy;
+    int x;
+    int y;
+    int w;
+    int h;
+    int dx;
+    int dy;
     int health;
     SDL_Texture* texture;
 };

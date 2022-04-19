@@ -5,6 +5,7 @@
 #include<SDL_image.h>
 #include"box.h"
 #include"game.h"
+#include<SDL_ttf.h>
 using namespace std;
 #define main SDL_main
 SDL_Renderer *renderer;
@@ -14,7 +15,7 @@ Plane bullet;
 Plane enemy;
 game app;
 void Screen(){
-    SDL_SetRenderDrawColor(renderer,96,128 ,255,255);
+//    SDL_SetRenderDrawColor(renderer,96,128 ,255,255);
     SDL_RenderClear(renderer);
 }
 void upScence(){
@@ -67,6 +68,9 @@ void doKeyDown(SDL_KeyboardEvent *event)
         {
             app.fire = 1;
         }
+        if(event->keysym.scancode== SDL_SCANCODE_X){
+            quitSDL(window,renderer);
+        }
 	}
 }
 void doKeyUp(SDL_KeyboardEvent *event)
@@ -96,6 +100,9 @@ void doKeyUp(SDL_KeyboardEvent *event)
         {
             app.fire = 0;
         }
+        if(event->keysym.scancode== SDL_SCANCODE_X){
+            quitSDL(window,renderer);
+        }
 	}
 }
 void doInput()
@@ -106,9 +113,7 @@ void doInput()
 	{
 		switch (event.type)
 		{
-			case SDL_QUIT:
-				exit(0);
-				break;
+
 
 			case SDL_KEYDOWN:
 				doKeyDown(&event.key);
@@ -145,39 +150,54 @@ void Framerate(long *a,float* remainder){
 
 	*a = SDL_GetTicks();
 }
-void spawnenemy(Plane enemy){
-    if(enemy.health!=0){
-         blit(enemy.texture,enemy.x,enemy.y);
-    }else{
-    enemy.health=1;
-    enemy.x=rand()% SCREEN_WIDTH/2;
-    enemy.y=rand()% SCREEN_HEIGHT/2;
-    blit(enemy.texture,enemy.x,enemy.y);
-    }
+void setpos(Plane a){
+    SDL_Rect tmp;
+    SDL_QueryTexture(a.texture, NULL, NULL, &tmp.w, &tmp.h);
+    a.w=tmp.w;
+    a.h=tmp.h;
+}
+bool collision(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2)
+{
+	return (max(x1, x2) < min(x1 + w1, x2 + w2)) && (max(y1, y2) < min(y1 + h1, y2 + h2));
 }
 
 int main(int argc,char* argv[])
 {
+    int score=0;
     IMG_Init(IMG_INIT_PNG);
     initSDL(window,renderer,WINDOW_TITLE,SCREEN_WIDTH,SCREEN_HEIGHT);
     long a;
     float remain;
     a=SDL_GetTicks();
     remain=0;
-    player.x = 50;
-	player.y = 50;
-	player.texture = loadTexture("player1.png");
+    player.x = 100;
+	player.y = 100;
+	player.texture = loadTexture("player.png");
 	bullet.texture = loadTexture("bullet.png");
-	enemy.texture= loadTexture("player1.png");
-	enemy.health=1;
-//	spawnenemy(enemy);
+	enemy.texture= loadTexture("enemy.png");
+	SDL_Texture *backgr=loadTexture("backgrnew.png");
+	enemy.x=SCREEN_WIDTH/2+rand()%(SCREEN_WIDTH/2);
+    enemy.y=rand()%SCREEN_HEIGHT;
     while(true){
         Screen();
-        spawnenemy(enemy);
-
+        blit(backgr,0,0);
         doInput();
+        setpos(enemy);
+		setpos(bullet);
+		if(collision(enemy.x,enemy.y,enemy.w,enemy.h,bullet.x,bullet.y,bullet.w,bullet.h)){
+            enemy.x=SCREEN_WIDTH/2+rand()%(SCREEN_WIDTH/2);
+            enemy.y=rand()%SCREEN_HEIGHT;
+		}
+        blit(enemy.texture,enemy.x,enemy.y);
         player.x += player.dx;
 		player.y += player.dy;
+        if(player.x>SCREEN_WIDTH/2-70){
+            player.x=SCREEN_WIDTH/2-70;
+        }
+        if(player.x<0){
+            player.x=0;
+        }
+
         if (app.up)
 		{
 			player.y -= PLAYER_SPEED;
@@ -197,10 +217,16 @@ int main(int argc,char* argv[])
 		{
 			player.x += PLAYER_SPEED;
 		}
+//		if(player.y<0){
+//            player.y=0;
+//        }
+//        if(player.y>SCREEN_HEIGHT){
+//            player.y=SCREEN_HEIGHT;
+//        }
 		if (app.fire && bullet.health == 0)
 		{
 			bullet.x = player.x;
-			bullet.y = player.y;
+			bullet.y = player.y+24;
 			bullet.dx = BULLET_SPEED;
 			bullet.dy = 0;
 			bullet.health = 1;
@@ -216,11 +242,13 @@ int main(int argc,char* argv[])
 
         blit(player.texture,player.x,player.y);
 
+
         if (bullet.health > 0)
 		{
 			blit(bullet.texture, bullet.x, bullet.y);
 
 		}
+
 		 upScence();
         Framerate(&a,&remain);
     }
