@@ -14,6 +14,7 @@ Plane player;
 Plane bullet;
 Plane enemy;
 game app;
+int score;
 void Screen(){
 //    SDL_SetRenderDrawColor(renderer,96,128 ,255,255);
     SDL_RenderClear(renderer);
@@ -70,6 +71,7 @@ void doKeyDown(SDL_KeyboardEvent *event)
         }
         if(event->keysym.scancode== SDL_SCANCODE_X){
             quitSDL(window,renderer);
+            cerr<<score;
         }
 	}
 }
@@ -102,6 +104,7 @@ void doKeyUp(SDL_KeyboardEvent *event)
         }
         if(event->keysym.scancode== SDL_SCANCODE_X){
             quitSDL(window,renderer);
+            cerr<<score;
         }
 	}
 }
@@ -150,7 +153,7 @@ void Framerate(long *a,float* remainder){
 
 	*a = SDL_GetTicks();
 }
-void setpos(Plane a){
+void setpos(Plane& a){
     SDL_Rect tmp;
     SDL_QueryTexture(a.texture, NULL, NULL, &tmp.w, &tmp.h);
     a.w=tmp.w;
@@ -158,12 +161,35 @@ void setpos(Plane a){
 }
 bool collision(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2)
 {
-	return (max(x1, x2) < min(x1 + w1, x2 + w2)) && (max(y1, y2) < min(y1 + h1, y2 + h2));
+	int lefte,leftb;
+	int righte,rightb;
+	int tope,topb;
+	int bote,botb;
+	lefte=x1;
+	righte=x1+w1;
+	tope= y1;
+	bote= y1+h1;
+	leftb=x2;
+	rightb=x2+w2;
+	topb=y2;
+	botb=y2+h2;
+	if(bote<=topb){
+        return false;
+	}
+	if(tope >= topb){
+        return false;
+	}
+	if(righte<=leftb){
+        return false;
+	}
+	if(lefte>=rightb){
+        return false;
+	}
+	return true;
 }
 
 int main(int argc,char* argv[])
 {
-    int score=0;
     IMG_Init(IMG_INIT_PNG);
     initSDL(window,renderer,WINDOW_TITLE,SCREEN_WIDTH,SCREEN_HEIGHT);
     long a;
@@ -176,17 +202,21 @@ int main(int argc,char* argv[])
 	bullet.texture = loadTexture("bullet.png");
 	enemy.texture= loadTexture("enemy.png");
 	SDL_Texture *backgr=loadTexture("backgrnew.png");
-	enemy.x=SCREEN_WIDTH/2+rand()%(SCREEN_WIDTH/2);
-    enemy.y=rand()%SCREEN_HEIGHT;
+	while(true){
+        enemy.x=SCREEN_WIDTH/2+rand()%(SCREEN_WIDTH/2);
+	enemy.y=rand()%(SCREEN_HEIGHT/2)/2;
+	}
+
     while(true){
         Screen();
         blit(backgr,0,0);
         doInput();
         setpos(enemy);
 		setpos(bullet);
-		if(collision(enemy.x,enemy.y,enemy.w,enemy.h,bullet.x,bullet.y,bullet.w,bullet.h)){
+		if(collision(bullet.x,bullet.y,bullet.w,bullet.h,enemy.x,enemy.y,enemy.w,enemy.h)){
             enemy.x=SCREEN_WIDTH/2+rand()%(SCREEN_WIDTH/2);
             enemy.y=rand()%SCREEN_HEIGHT;
+            score++;
 		}
         blit(enemy.texture,enemy.x,enemy.y);
         player.x += player.dx;
