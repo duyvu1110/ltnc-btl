@@ -202,11 +202,9 @@ int main(int argc,char* argv[])
 	bullet.texture = loadTexture("bullet.png");
 	enemy.texture= loadTexture("enemy.png");
 	SDL_Texture *backgr=loadTexture("backgrnew.png");
-	while(true){
-        enemy.x=SCREEN_WIDTH/2+rand()%(SCREEN_WIDTH/2);
-	enemy.y=rand()%(SCREEN_HEIGHT/2)/2;
-	}
-
+	enemy.x=rand()%SCREEN_WIDTH/2;
+	enemy.y=rand()%SCREEN_HEIGHT;
+    setpos(player);
     while(true){
         Screen();
         blit(backgr,0,0);
@@ -226,6 +224,12 @@ int main(int argc,char* argv[])
         }
         if(player.x<0){
             player.x=0;
+        }
+        if(player.y<0){
+            player.y=0;
+        }
+        if(player.y>SCREEN_HEIGHT-player.h){
+            player.y=SCREEN_HEIGHT-player.h;
         }
 
         if (app.up)
