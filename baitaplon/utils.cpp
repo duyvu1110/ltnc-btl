@@ -54,3 +54,4 @@ void waitUntilKeyPressed()
         SDL_Delay(100);
     }
 }
+
