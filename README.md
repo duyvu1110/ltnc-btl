@@ -1,1 +1,1 @@
-try to memorize as much as possible
+shooting to dead
