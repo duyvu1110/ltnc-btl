@@ -6,6 +6,7 @@ const string WINDOW_TITLE = "Shooting 2D";
 const int PLAYER_SPEED=3;
 const int BULLET_SPEED=20;
 const int TIME=30;
+const SDL_Color WHITE_COLOR = {255, 255, 255};
 
 
 
