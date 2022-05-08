@@ -159,7 +159,7 @@ void spawnenemy() {
         enemy.x=SCREEN_WIDTH/2;
     }
     if(enemy.x>SCREEN_WIDTH-enemy.w-50) {
-        SCREEN_WIDTH-enemy.w-50;
+        enemy.x=SCREEN_WIDTH-enemy.w-50;
     }
     if(enemy.y<50) {
         enemy.y=50;
@@ -214,7 +214,7 @@ int main(int argc,char* argv[]) {
     IMG_Init(IMG_INIT_PNG);
     TTF_Init();
     SDL_Init(SDL_INIT_AUDIO);
-    Mix_OpenAudio(MIX_DEFAULT_FREQUENCY*2,MIX_DEFAULT_FORMAT,MIX_DEFAULT_CHANNELS,1000000);
+    Mix_OpenAudio(MIX_DEFAULT_FREQUENCY*2,MIX_DEFAULT_FORMAT,MIX_DEFAULT_CHANNELS,2048);
     Mix_Music *bgm= Mix_LoadMUS("bgm.mp3");
 
     initSDL(window,renderer,WINDOW_TITLE,SCREEN_WIDTH,SCREEN_HEIGHT);
@@ -227,13 +227,12 @@ int main(int argc,char* argv[]) {
     SDL_Texture *backgr=loadTexture("backgrnew.png");
     SDL_Texture* explos= loadTexture("explosion.png");
     spawnenemy();
-
+    Mix_PlayMusic(bgm,-1);
     while(true) {
         doInput();
         if(enter) {
             Screen();
             blit(backgr,0,0);
-            Mix_PlayMusic(bgm,-1);
             setpos(player);
             setpos(enemy);
             setpos(bullet);
