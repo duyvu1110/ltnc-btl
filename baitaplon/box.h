@@ -13,8 +13,6 @@ struct Plane {
     int y;
     int w;
     int h;
-    int dx;
-    int dy;
     int health;
     SDL_Texture* texture;
 };

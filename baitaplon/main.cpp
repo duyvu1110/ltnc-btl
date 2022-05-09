@@ -125,31 +125,9 @@ void setpos(Plane& a) {
     a.h=tmp.h;
 }
 bool collision(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2) {
-    int lefte,leftb;
-    int righte,rightb;
-    int tope,topb;
-    int bote,botb;
-    lefte=x1;
-    righte=x1+w1;
-    tope= y1;
-    bote= y1+h1;
-    leftb=x2;
-    rightb=x2+w2;
-    topb=y2;
-    botb=y2+h2;
-    if(bote<=topb) {
-        return false;
-    }
-    if(tope >= topb) {
-        return false;
-    }
-    if(righte<=leftb) {
-        return false;
-    }
-    if(lefte>=rightb) {
-        return false;
-    }
-    return true;
+        bool collision_x=x1+w1>=x2&&x2+w2>=x1;
+        bool collision_y=y1+h1>=y2&&y2+h2>=y1;
+        return collision_x && collision_y;
 }
 void spawnenemy() {
     setpos(enemy);
@@ -172,14 +150,10 @@ void dobullet() {
     if (app.fire && bullet.health == 0) {
         bullet.x = player.x;
         bullet.y = player.y+24;
-        bullet.dx = BULLET_SPEED;
-        bullet.dy = 0;
         bullet.health = 1;
     }
 
-    bullet.x += bullet.dx;
-    bullet.y += bullet.dy;
-
+    bullet.x += BULLET_SPEED;
     if (bullet.x > SCREEN_WIDTH||collision(bullet.x,bullet.y,bullet.w,bullet.h,enemy.x,enemy.y,enemy.w,enemy.h)) {
         bullet.health = 0;
     }
@@ -201,13 +175,19 @@ SDL_Texture *toTexture(SDL_Surface *surface, int destroySurface)
 
 	return texture;
 }
-SDL_Texture *getTextTexture(char *text)
+SDL_Texture *getTextTexture(const char *text)
 {
 	SDL_Surface *surface;
 
-	surface = TTF_RenderUTF8_Blended(TTF_OpenFont("font.ttf",25), text,WHITE_COLOR);
+	surface = TTF_RenderText_Solid(TTF_OpenFont("font.ttf",25), text,WHITE_COLOR);
 
 	return toTexture(surface, 1);
+}
+void screenscore(){
+    string s="Score: ";
+    s+=to_string(score);
+    SDL_Texture* point= getTextTexture(s.c_str());
+    blit(point,10,10);
 }
 
 int main(int argc,char* argv[]) {
@@ -216,11 +196,9 @@ int main(int argc,char* argv[]) {
     SDL_Init(SDL_INIT_AUDIO);
     Mix_OpenAudio(MIX_DEFAULT_FREQUENCY*2,MIX_DEFAULT_FORMAT,MIX_DEFAULT_CHANNELS,2048);
     Mix_Music *bgm= Mix_LoadMUS("bgm.mp3");
-
     initSDL(window,renderer,WINDOW_TITLE,SCREEN_WIDTH,SCREEN_HEIGHT);
     player.x = 100;
     player.y = 100;
-
     player.texture = loadTexture("player.png");
     bullet.texture = loadTexture("bullet.png");
     enemy.texture= loadTexture("enemy.png");
@@ -233,17 +211,17 @@ int main(int argc,char* argv[]) {
         if(enter) {
             Screen();
             blit(backgr,0,0);
+            screenscore();
             setpos(player);
             setpos(enemy);
             setpos(bullet);
-            if(collision(bullet.x,bullet.y,bullet.w,bullet.h,enemy.x,enemy.y,enemy.w/2,enemy.h/2)) {
+            if(collision(bullet.x,bullet.y,bullet.w,bullet.h,enemy.x,enemy.y,enemy.w,enemy.h)) {
                 blit(explos,enemy.x,enemy.y);
                 spawnenemy();
                 score++;
+                screenscore();
             }
             blit(enemy.texture,enemy.x,enemy.y);
-            player.x += player.dx;
-            player.y += player.dy;
             if(player.x>SCREEN_WIDTH/2-70) {
                 player.x=SCREEN_WIDTH/2-70;
             }
