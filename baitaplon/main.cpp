@@ -14,11 +14,17 @@ SDL_Window *window;
 Plane player;
 Plane bullet;
 Plane enemy;
+Plane enemy1;
+Plane enemy2;
 Plane enemybullet;
+Plane enemybullet1;
+Plane enemybullet2;
 game app;
+bool gamerunning=true;
 int score;
 int highscore;
 int damage=0;
+int bulletspeed=0;
 bool enter=false;
 void Screen() {
     SDL_RenderClear(renderer);
@@ -44,24 +50,26 @@ void blit(SDL_Texture *texture, int x, int y) {
     SDL_QueryTexture(texture, NULL, NULL, &dest.w, &dest.h);
     SDL_RenderCopy(renderer, texture, NULL, &dest);
 }
-
 void doKeyDown(SDL_KeyboardEvent *event) {
     if(event->keysym.scancode==SDL_SCANCODE_E){
         damage=1;
+        bulletspeed=10;
         score=0;
         player.health=5;
         enter=true;
     }
     if(event->keysym.scancode==SDL_SCANCODE_M){
         damage=2;
+        bulletspeed=15;
         score =0;
-        player.health=4;
+        player.health=5;
         enter=true;
     }
     if(event->keysym.scancode==SDL_SCANCODE_H){
         damage=3;
+        bulletspeed=20;
         score =0;
-        player.health=3;
+        player.health=5;
         enter=true;
     }if(event->keysym.scancode==SDL_SCANCODE_R){
         enter=false;
@@ -87,23 +95,27 @@ void doKeyDown(SDL_KeyboardEvent *event) {
         }
         if(event->keysym.scancode== SDL_SCANCODE_X) {
             quitSDL(window,renderer);
+            gamerunning=false;
         }
     }
 }
 void doKeyUp(SDL_KeyboardEvent *event) {
     if(event->keysym.scancode==SDL_SCANCODE_E){
         damage=1;
+        bulletspeed=10;
         player.health=5;
         enter=true;
     }
     if(event->keysym.scancode==SDL_SCANCODE_M){
         damage=2;
-        player.health=4;
+        bulletspeed=15;
+        player.health=5;
         enter=true;
     }
     if(event->keysym.scancode==SDL_SCANCODE_H){
         damage=3;
-        player.health=3;
+        bulletspeed=20;
+        player.health=5;
         enter=true;
     }
     if (event->repeat == 0) {
@@ -127,6 +139,7 @@ void doKeyUp(SDL_KeyboardEvent *event) {
         }
         if(event->keysym.scancode== SDL_SCANCODE_X) {
             quitSDL(window,renderer);
+            gamerunning=false;
         }
     }
 }
@@ -142,6 +155,9 @@ void doInput() {
         case SDL_KEYUP:
             doKeyUp(&event.key);
             break;
+        case SDL_QUIT:
+            quitSDL(window,renderer);
+            break;
         default:
             break;
         }
@@ -153,26 +169,41 @@ void setpos(Plane& a) {
     a.w=tmp.w;
     a.h=tmp.h;
 }
-bool collision(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2) {
+bool collision(Plane e1,Plane e2) {
+        int x1=e1.x,w1=e1.w;
+        int x2=e2.x,w2=e2.w;
+        int y1=e1.y,h1=e1.h;
+        int y2=e2.y,h2=e2.h;
         bool collision_x=x1+w1>=x2&&x2+w2>=x1;
         bool collision_y=y1+h1>=y2&&y2+h2>=y1;
         return collision_x && collision_y;
 }
-void spawnenemy() {
-    setpos(enemy);
-    enemy.x=rand()%SCREEN_WIDTH;
-    enemy.y=rand()%SCREEN_HEIGHT;
-    if(enemy.x<SCREEN_WIDTH/2) {
-        enemy.x=SCREEN_WIDTH/2;
+void spawnenemy(Plane &enemyx) {
+    setpos(enemyx);
+    enemyx.x=rand()%SCREEN_WIDTH;
+    enemyx.y=rand()%SCREEN_HEIGHT;
+    if(enemyx.x<SCREEN_WIDTH/2) {
+        enemyx.x=SCREEN_WIDTH/2;
     }
-    if(enemy.x>SCREEN_WIDTH-enemy.w-50) {
-        enemy.x=SCREEN_WIDTH-enemy.w-50;
+    if(enemyx.x>SCREEN_WIDTH-enemyx.w-50) {
+        enemyx.x=SCREEN_WIDTH-enemyx.w-50;
     }
-    if(enemy.y<50) {
-        enemy.y=50;
+    if(enemyx.y<50) {
+        enemyx.y=50;
     }
-    if(enemy.y>SCREEN_HEIGHT-enemy.h-50) {
-        enemy.y=SCREEN_HEIGHT-enemy.h-50;
+    if(enemyx.y>SCREEN_HEIGHT-enemyx.h-50) {
+        enemyx.y=SCREEN_HEIGHT-enemyx.h-50;
+    }
+}
+void logic(){
+    while(collision(enemy1,enemy)){
+        spawnenemy(enemy1);
+    }
+    while(collision(enemy2,enemy)){
+        spawnenemy(enemy2);
+    }
+    while(collision(enemy1,enemy2)){
+        spawnenemy(enemy2);
     }
 }
 void dobullet() {
@@ -183,14 +214,13 @@ void dobullet() {
     }
 
     bullet.x += BULLET_SPEED;
-    if (bullet.x > SCREEN_WIDTH||collision(bullet.x,bullet.y,bullet.w,bullet.h,enemy.x,enemy.y,enemy.w,enemy.h)) {
+    if (bullet.x > SCREEN_WIDTH||collision(bullet,enemy)||collision(bullet,enemy1)||collision(bullet,enemy2)) {
         bullet.health = 0;
     }
     if (bullet.health > 0) {
         blit(bullet.texture, bullet.x, bullet.y);
     }
 }
-
 SDL_Texture *toTexture(SDL_Surface *surface, int destroySurface)
 {
 	SDL_Texture *texture;
@@ -222,18 +252,46 @@ void screenscore(){
     SDL_Texture* hipoint= getTextTexture(w.c_str());
     blit(hipoint,SCREEN_WIDTH-100,10);
 }
-void enemyfire(){
-    if (enemybullet.health == 0) {
+void enemyfire(int bulletspeed){
+  if (enemybullet.health == 0) {
         enemybullet.x = enemy.x;
         enemybullet.y = enemy.y+24;
         enemybullet.health = 1;
     }
-    enemybullet.x -= BULLET_SPEED;
-    if (enemybullet.x <0||collision(enemybullet.x,enemybullet.y,enemybullet.w,enemybullet.h,player.x,player.y,player.w,player.h)) {
+    enemybullet.x -=bulletspeed ;
+    if (enemybullet.x <0||collision(enemybullet,player)) {
         enemybullet.health = 0;
     }
     if (enemybullet.health > 0) {
         blit(enemybullet.texture, enemybullet.x, enemybullet.y);
+    }
+}
+void enemy1fire(int bulletspeed){
+    if (enemybullet1.health == 0) {
+        enemybullet1.x = enemy1.x;
+        enemybullet1.y = enemy1.y+24;
+        enemybullet1.health = 1;
+    }
+    enemybullet1.x -=bulletspeed ;
+    if (enemybullet1.x <0||collision(enemybullet1,player)) {
+        enemybullet1.health = 0;
+    }
+    if (enemybullet1.health > 0) {
+        blit(enemybullet1.texture, enemybullet1.x, enemybullet1.y);
+    }
+}
+void enemy2fire(int bulletspeed){
+    if (enemybullet2.health == 0) {
+        enemybullet2.x = enemy2.x;
+        enemybullet2.y = enemy2.y+24;
+        enemybullet2.health = 1;
+    }
+    enemybullet2.x -=bulletspeed ;
+    if (enemybullet2.x <0||collision(enemybullet2,player)) {
+        enemybullet2.health = 0;
+    }
+    if (enemybullet2.health > 0) {
+        blit(enemybullet2.texture, enemybullet2.x, enemybullet2.y);
     }
 }
 void playermove(){
@@ -272,12 +330,14 @@ void Menu()
     SDL_Texture *s2=getTextTexture("Press 'E' for easy");
     SDL_Texture *s3=getTextTexture("Press 'M' for medium");
     SDL_Texture *s4=getTextTexture("Press 'H' for hard");
+    SDL_Texture *s5=getTextTexture("Press 'C' to shoot");
     blit(s1,SCREEN_WIDTH/2-150,SCREEN_HEIGHT/2-100);
     blit(s2,SCREEN_WIDTH/2-90,SCREEN_HEIGHT/2-70);
     blit(s3,SCREEN_WIDTH/2-90,SCREEN_HEIGHT/2-40);
     blit(s4,SCREEN_WIDTH/2-90,SCREEN_HEIGHT/2-10);
-    SDL_Texture *s5=getTextTexture("Press 'X' to exit");
-    blit(s5,SCREEN_WIDTH/2-150,SCREEN_HEIGHT/2+20);
+    SDL_Texture *s6=getTextTexture("Press 'X' to exit");
+    blit(s5,SCREEN_WIDTH/2-150,SCREEN_HEIGHT/2+50);
+    blit(s6,SCREEN_WIDTH/2-150,SCREEN_HEIGHT/2+20);
 
 }
 void gameover(){
@@ -305,23 +365,33 @@ int main(int argc,char* argv[]) {
     player.texture = loadTexture("player.png");
     bullet.texture = loadTexture("bullet.png");
     enemy.texture= loadTexture("enemy.png");
+    enemy1.texture= loadTexture("enemy.png");
+    enemy2.texture= loadTexture("enemy.png");
+
     enemybullet.texture=loadTexture("enemybullet.1.png");
+    enemybullet1.texture=loadTexture("enemybullet.1.png");
+    enemybullet2.texture=loadTexture("enemybullet.1.png");
     SDL_Texture *backgr=loadTexture("backgrnew.png");
     SDL_Texture* explos= loadTexture("explosion.png");
-    spawnenemy();
+    spawnenemy(enemy);
+    spawnenemy(enemy1);
+    spawnenemy(enemy2);
     Mix_PlayMusic(bgm,-1);
-    while(true) {
+    while(gamerunning) {
         doInput();
         if(enter) {
             Screen();
             blit(backgr,0,0);
             screenscore();
+            logic();
             setpos(player);
             setpos(enemy);
+            setpos(enemy1);
+            setpos(enemy2);
             setpos(bullet);
-            if(collision(bullet.x,bullet.y,bullet.w,bullet.h,enemy.x,enemy.y,enemy.w,enemy.h)) {
+            if(collision(bullet,enemy)) {
                 blit(explos,enemy.x,enemy.y);
-                spawnenemy();
+                spawnenemy(enemy);
                 enemybullet.health=0;
                 score++;
                 if(highscore<score){
@@ -329,11 +399,35 @@ int main(int argc,char* argv[]) {
                 }
                 screenscore();
             }
-            if(collision(enemybullet.x,enemybullet.y,enemybullet.w,enemybullet.h,player.x,player.y,player.w,player.h)){
+            if(collision(bullet,enemy1)) {
+                blit(explos,enemy1.x,enemy1.y);
+                spawnenemy(enemy1);
+                enemybullet1.health=0;
+                score++;
+                if(highscore<score){
+                    highscore++;
+                }
+                screenscore();
+            }
+            if(collision(bullet,enemy2)) {
+                blit(explos,enemy2.x,enemy2.y);
+                spawnenemy(enemy2);
+                enemybullet2.health=0;
+                score++;
+                if(highscore<score){
+                    highscore++;
+                }
+                screenscore();
+            }
+            if(collision(enemybullet,player)||collision(enemybullet1,player)||collision(enemybullet2,player)){
                 player.health-=damage;
             }
             blit(enemy.texture,enemy.x,enemy.y);
-            enemyfire();
+            blit(enemy1.texture,enemy1.x,enemy1.y);
+            blit(enemy2.texture,enemy2.x,enemy2.y);
+            enemyfire(bulletspeed);
+            enemy1fire(bulletspeed);
+            enemy2fire(bulletspeed);
             playermove();
             string s="Health:";
             s+=to_string(player.health);

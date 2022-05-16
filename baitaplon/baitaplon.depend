@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1652282364 source:d:\1\programming\ltnc-btl\baitaplon\main.cpp
+1652684977 source:d:\1\programming\ltnc-btl\baitaplon\main.cpp
 	<iostream>
 	<SDL.h>
 	"utils.h"
@@ -24,9 +24,12 @@
 	<iostream>
 	<SDL.h>
 
-1651046387 source:d:\1\programming\ltnc-btl\baitaplon\utils.cpp
+1652669805 source:d:\1\programming\ltnc-btl\baitaplon\utils.cpp
 	<iostream>
 	<SDL.h>
+	<SDL_ttf.h>
+	<SDL_image.h>
+	<SDL_mixer.h>
 	"utils.h"
 
 1648565424 d:\1\programming\ltnc-btl\baitaplon\fruits.h

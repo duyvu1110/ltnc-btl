@@ -1,6 +1,9 @@
 
 #include <iostream>
 #include <SDL.h>
+#include <SDL_ttf.h>
+#include <SDL_image.h>
+#include <SDL_mixer.h>
 #include "utils.h"
 
 using namespace std;
@@ -42,6 +45,9 @@ void quitSDL(SDL_Window* window, SDL_Renderer* renderer)
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
+    TTF_Quit();
+    IMG_Quit();
+    Mix_Quit();
 }
 
 void waitUntilKeyPressed()
