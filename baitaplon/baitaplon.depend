@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1652950507 source:d:\1\programming\ltnc-btl\baitaplon\main.cpp
+1652969350 source:d:\1\programming\ltnc-btl\baitaplon\main.cpp
 	<iostream>
 	<SDL.h>
 	"utils.h"

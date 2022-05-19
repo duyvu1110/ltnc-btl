@@ -79,8 +79,8 @@ void spawnenemy(Plane &enemyx) {
 void doKeyDown(SDL_KeyboardEvent *event) {
     if(event->keysym.scancode==SDL_SCANCODE_E){
         damage=1;
-        div_bullet=60;
-        div_enemy=500;
+        div_bullet=55;
+        div_enemy=400;
         score=0;
         enemybullet.health=0;
         enemybullet1.health=0;
@@ -94,8 +94,8 @@ void doKeyDown(SDL_KeyboardEvent *event) {
     }
     if(event->keysym.scancode==SDL_SCANCODE_M){
         damage=2;
-        div_bullet=55;
-        div_enemy=400;
+        div_bullet=50;
+        div_enemy=300;
         score =0;
          enemybullet.health=0;
         enemybullet1.health=0;
@@ -109,8 +109,8 @@ void doKeyDown(SDL_KeyboardEvent *event) {
     }
     if(event->keysym.scancode==SDL_SCANCODE_H){
         damage=3;
-        div_bullet=50;
-        div_enemy=300;
+        div_bullet=40;
+        div_enemy=200;
         score =0;
          enemybullet.health=0;
         enemybullet1.health=0;
@@ -167,13 +167,13 @@ void doKeyDown(SDL_KeyboardEvent *event) {
 void doKeyUp(SDL_KeyboardEvent *event) {
     if(event->keysym.scancode==SDL_SCANCODE_E){
         damage=1;
-        div_bullet=60;
-        div_enemy=500;
+        div_bullet=55;
+        div_enemy=400;
         score=0;
         enemybullet.health=0;
         enemybullet1.health=0;
         enemybullet2.health=0;
-         spawnenemy(enemy);
+        spawnenemy(enemy);
         spawnenemy(enemy1);
         spawnenemy (enemy2);
         setplayer();
@@ -182,10 +182,10 @@ void doKeyUp(SDL_KeyboardEvent *event) {
     }
     if(event->keysym.scancode==SDL_SCANCODE_M){
         damage=2;
-        div_bullet=55;
-        div_enemy=400;
+        div_bullet=50;
+        div_enemy=300;
         score =0;
-        enemybullet.health=0;
+         enemybullet.health=0;
         enemybullet1.health=0;
         enemybullet2.health=0;
          spawnenemy(enemy);
@@ -197,19 +197,22 @@ void doKeyUp(SDL_KeyboardEvent *event) {
     }
     if(event->keysym.scancode==SDL_SCANCODE_H){
         damage=3;
-        div_bullet=50;
-        div_enemy=300;
+        div_bullet=40;
+        div_enemy=200;
+        score =0;
+         enemybullet.health=0;
+        enemybullet1.health=0;
+        enemybullet2.health=0;
          spawnenemy(enemy);
         spawnenemy(enemy1);
         spawnenemy (enemy2);
-        score =0;
-        enemybullet.health=0;
-        enemybullet1.health=0;
-        enemybullet2.health=0;
         setplayer();
         player.health=5;
         enter=true;
+    }if(event->keysym.scancode==SDL_SCANCODE_R){
+        enter=false;
     }
+
     if (event->repeat == 0) {
         if (event->keysym.scancode == SDL_SCANCODE_UP) {
             app.up = 0;
@@ -593,7 +596,6 @@ int main(int argc,char* argv[]) {
             dobullet();
             if(player.health<=0){
 //                blit(explos,player.x,player.y);
-                SDL_RenderClear(renderer);
                 blit(backgr,0,0);
                 app.fire=0;
                 gameover();
