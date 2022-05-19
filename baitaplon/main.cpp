@@ -145,14 +145,19 @@ void doKeyDown(SDL_KeyboardEvent *event) {
         }
         if(event->keysym.scancode== SDL_SCANCODE_X) {
             gameStream.open("input.txt",ios::out|ios::trunc);
-            int key=1;
-            gameStream<<key<<endl;
-            gameStream<<enemy.x<<" "<<enemy.y<<endl;
-            gameStream<<enemy1.x<<" "<<enemy1.y<<endl;
-            gameStream<<enemy2.x<<" "<<enemy2.y<<endl;
-            gameStream<<player.x<<" "<<player.y<<" "<<player.health<<endl;
-            gameStream<<damage<<" "<<div_bullet<<" "<<div_enemy<<endl;
-            gameStream<<score<<" "<<highscore<<endl;
+            if(player.health<=0){
+                gameStream<<0;
+            }else{
+                gameStream<<1<<endl;
+                gameStream<<enemy.x<<" "<<enemy.y<<endl;
+                gameStream<<enemy1.x<<" "<<enemy1.y<<endl;
+                gameStream<<enemy2.x<<" "<<enemy2.y<<endl;
+                gameStream<<player.x<<" "<<player.y<<" "<<player.health<<endl;
+                gameStream<<damage<<" "<<div_bullet<<" "<<div_enemy<<endl;
+                gameStream<<score<<" "<<highscore<<endl;
+            }
+
+
             gameStream.close();
             quitSDL(window,renderer);
             gamerunning=false;
@@ -226,14 +231,17 @@ void doKeyUp(SDL_KeyboardEvent *event) {
         }
         if(event->keysym.scancode== SDL_SCANCODE_X) {
             gameStream.open("input.txt",ios::out|ios::trunc);
-            int key=1;
-            gameStream<<key<<endl;
-            gameStream<<enemy.x<<" "<<enemy.y<<endl;
-            gameStream<<enemy1.x<<" "<<enemy1.y<<endl;
-            gameStream<<enemy2.x<<" "<<enemy2.y<<endl;
-            gameStream<<player.x<<" "<<player.y<<" "<<player.health<<endl;
-            gameStream<<damage<<" "<<div_bullet<<" "<<div_enemy<<endl;
-            gameStream<<score<<" "<<highscore<<endl;
+            if(player.health<=0){
+                gameStream<<0;
+            }else{
+                gameStream<<1<<endl;
+                gameStream<<enemy.x<<" "<<enemy.y<<endl;
+                gameStream<<enemy1.x<<" "<<enemy1.y<<endl;
+                gameStream<<enemy2.x<<" "<<enemy2.y<<endl;
+                gameStream<<player.x<<" "<<player.y<<" "<<player.health<<endl;
+                gameStream<<damage<<" "<<div_bullet<<" "<<div_enemy<<endl;
+                gameStream<<score<<" "<<highscore<<endl;
+            }
             gameStream.close();
             quitSDL(window,renderer);
             gamerunning=false;
