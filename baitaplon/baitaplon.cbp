@@ -34,6 +34,7 @@
 		</Compiler>
 		<Unit filename="box.h" />
 		<Unit filename="game.h" />
+		<Unit filename="input.txt" />
 		<Unit filename="main.cpp" />
 		<Unit filename="params.h" />
 		<Unit filename="utils.cpp" />

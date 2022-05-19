@@ -7,6 +7,7 @@
 #include"game.h"
 #include<SDL_ttf.h>
 #include<SDL_mixer.h>
+#include<fstream>
 using namespace std;
 #define main SDL_main
 SDL_Renderer *renderer;
@@ -19,13 +20,17 @@ Plane enemy2;
 Plane enemybullet;
 Plane enemybullet1;
 Plane enemybullet2;
+int div_bullet;
+int div_enemy;
 game app;
+int SPEED=0;
 bool gamerunning=true;
 int score;
 int highscore;
 int damage=0;
-int bulletspeed=0;
+int key=0;
 bool enter=false;
+fstream gameStream;
 void Screen() {
     SDL_RenderClear(renderer);
 }
@@ -50,25 +55,70 @@ void blit(SDL_Texture *texture, int x, int y) {
     SDL_QueryTexture(texture, NULL, NULL, &dest.w, &dest.h);
     SDL_RenderCopy(renderer, texture, NULL, &dest);
 }
+void setpos(Plane& a) {
+    SDL_Rect tmp;
+    SDL_QueryTexture(a.texture, NULL, NULL, &tmp.w, &tmp.h);
+    a.w=tmp.w;
+    a.h=tmp.h;
+}
+void setplayer(){
+    player.x=100;
+    player.y=100;
+}
+void spawnenemy(Plane &enemyx) {
+    setpos(enemyx);
+    enemyx.x=SCREEN_WIDTH-enemyx.w;
+    enemyx.y=rand()%SCREEN_HEIGHT;
+    if(enemyx.y<50) {
+        enemyx.y=50;
+    }
+    if(enemyx.y>SCREEN_HEIGHT-enemyx.h-50) {
+        enemyx.y=SCREEN_HEIGHT-enemyx.h-50;
+    }
+}
 void doKeyDown(SDL_KeyboardEvent *event) {
     if(event->keysym.scancode==SDL_SCANCODE_E){
         damage=1;
-        bulletspeed=10;
+        div_bullet=60;
+        div_enemy=500;
         score=0;
+        enemybullet.health=0;
+        enemybullet1.health=0;
+        enemybullet2.health=0;
+        spawnenemy(enemy);
+        spawnenemy(enemy1);
+        spawnenemy (enemy2);
+        setplayer();
         player.health=5;
         enter=true;
     }
     if(event->keysym.scancode==SDL_SCANCODE_M){
         damage=2;
-        bulletspeed=15;
+        div_bullet=55;
+        div_enemy=400;
         score =0;
+         enemybullet.health=0;
+        enemybullet1.health=0;
+        enemybullet2.health=0;
+         spawnenemy(enemy);
+        spawnenemy(enemy1);
+        spawnenemy (enemy2);
+        setplayer();
         player.health=5;
         enter=true;
     }
     if(event->keysym.scancode==SDL_SCANCODE_H){
         damage=3;
-        bulletspeed=20;
+        div_bullet=50;
+        div_enemy=300;
         score =0;
+         enemybullet.health=0;
+        enemybullet1.health=0;
+        enemybullet2.health=0;
+         spawnenemy(enemy);
+        spawnenemy(enemy1);
+        spawnenemy (enemy2);
+        setplayer();
         player.health=5;
         enter=true;
     }if(event->keysym.scancode==SDL_SCANCODE_R){
@@ -94,6 +144,16 @@ void doKeyDown(SDL_KeyboardEvent *event) {
             app.fire = 1;
         }
         if(event->keysym.scancode== SDL_SCANCODE_X) {
+            gameStream.open("input.txt",ios::out|ios::trunc);
+            int key=1;
+            gameStream<<key<<endl;
+            gameStream<<enemy.x<<" "<<enemy.y<<endl;
+            gameStream<<enemy1.x<<" "<<enemy1.y<<endl;
+            gameStream<<enemy2.x<<" "<<enemy2.y<<endl;
+            gameStream<<player.x<<" "<<player.y<<" "<<player.health<<endl;
+            gameStream<<damage<<" "<<div_bullet<<" "<<div_enemy<<endl;
+            gameStream<<score<<" "<<highscore<<endl;
+            gameStream.close();
             quitSDL(window,renderer);
             gamerunning=false;
         }
@@ -102,19 +162,46 @@ void doKeyDown(SDL_KeyboardEvent *event) {
 void doKeyUp(SDL_KeyboardEvent *event) {
     if(event->keysym.scancode==SDL_SCANCODE_E){
         damage=1;
-        bulletspeed=10;
+        div_bullet=60;
+        div_enemy=500;
+        score=0;
+        enemybullet.health=0;
+        enemybullet1.health=0;
+        enemybullet2.health=0;
+         spawnenemy(enemy);
+        spawnenemy(enemy1);
+        spawnenemy (enemy2);
+        setplayer();
         player.health=5;
         enter=true;
     }
     if(event->keysym.scancode==SDL_SCANCODE_M){
         damage=2;
-        bulletspeed=15;
+        div_bullet=55;
+        div_enemy=400;
+        score =0;
+        enemybullet.health=0;
+        enemybullet1.health=0;
+        enemybullet2.health=0;
+         spawnenemy(enemy);
+        spawnenemy(enemy1);
+        spawnenemy (enemy2);
+        setplayer();
         player.health=5;
         enter=true;
     }
     if(event->keysym.scancode==SDL_SCANCODE_H){
         damage=3;
-        bulletspeed=20;
+        div_bullet=50;
+        div_enemy=300;
+         spawnenemy(enemy);
+        spawnenemy(enemy1);
+        spawnenemy (enemy2);
+        score =0;
+        enemybullet.health=0;
+        enemybullet1.health=0;
+        enemybullet2.health=0;
+        setplayer();
         player.health=5;
         enter=true;
     }
@@ -138,12 +225,22 @@ void doKeyUp(SDL_KeyboardEvent *event) {
             app.fire = 0;
         }
         if(event->keysym.scancode== SDL_SCANCODE_X) {
+            gameStream.open("input.txt",ios::out|ios::trunc);
+            int key=1;
+            gameStream<<key<<endl;
+            gameStream<<enemy.x<<" "<<enemy.y<<endl;
+            gameStream<<enemy1.x<<" "<<enemy1.y<<endl;
+            gameStream<<enemy2.x<<" "<<enemy2.y<<endl;
+            gameStream<<player.x<<" "<<player.y<<" "<<player.health<<endl;
+            gameStream<<damage<<" "<<div_bullet<<" "<<div_enemy<<endl;
+            gameStream<<score<<" "<<highscore<<endl;
+            gameStream.close();
             quitSDL(window,renderer);
             gamerunning=false;
         }
     }
 }
-void doInput() {
+void dogameStream() {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
 
@@ -163,49 +260,16 @@ void doInput() {
         }
     }
 }
-void setpos(Plane& a) {
-    SDL_Rect tmp;
-    SDL_QueryTexture(a.texture, NULL, NULL, &tmp.w, &tmp.h);
-    a.w=tmp.w;
-    a.h=tmp.h;
-}
 bool collision(Plane e1,Plane e2) {
-        int x1=e1.x,w1=e1.w;
-        int x2=e2.x,w2=e2.w;
-        int y1=e1.y,h1=e1.h;
-        int y2=e2.y,h2=e2.h;
+        int x1=e1.x-20,w1=e1.w-20;
+        int x2=e2.x-20,w2=e2.w-20;
+        int y1=e1.y-20,h1=e1.h-20;
+        int y2=e2.y-20,h2=e2.h-20;
         bool collision_x=x1+w1>=x2&&x2+w2>=x1;
         bool collision_y=y1+h1>=y2&&y2+h2>=y1;
         return collision_x && collision_y;
 }
-void spawnenemy(Plane &enemyx) {
-    setpos(enemyx);
-    enemyx.x=rand()%SCREEN_WIDTH;
-    enemyx.y=rand()%SCREEN_HEIGHT;
-    if(enemyx.x<SCREEN_WIDTH/2) {
-        enemyx.x=SCREEN_WIDTH/2;
-    }
-    if(enemyx.x>SCREEN_WIDTH-enemyx.w-50) {
-        enemyx.x=SCREEN_WIDTH-enemyx.w-50;
-    }
-    if(enemyx.y<50) {
-        enemyx.y=50;
-    }
-    if(enemyx.y>SCREEN_HEIGHT-enemyx.h-50) {
-        enemyx.y=SCREEN_HEIGHT-enemyx.h-50;
-    }
-}
-void logic(){
-    while(collision(enemy1,enemy)){
-        spawnenemy(enemy1);
-    }
-    while(collision(enemy2,enemy)){
-        spawnenemy(enemy2);
-    }
-    while(collision(enemy1,enemy2)){
-        spawnenemy(enemy2);
-    }
-}
+
 void dobullet() {
     if (app.fire && bullet.health == 0) {
         bullet.x = player.x;
@@ -214,6 +278,7 @@ void dobullet() {
     }
 
     bullet.x += BULLET_SPEED;
+//    bullet.y += BULLET_SPEED;
     if (bullet.x > SCREEN_WIDTH||collision(bullet,enemy)||collision(bullet,enemy1)||collision(bullet,enemy2)) {
         bullet.health = 0;
     }
@@ -252,60 +317,100 @@ void screenscore(){
     SDL_Texture* hipoint= getTextTexture(w.c_str());
     blit(hipoint,SCREEN_WIDTH-100,10);
 }
-void enemyfire(int bulletspeed){
-  if (enemybullet.health == 0) {
-        enemybullet.x = enemy.x;
-        enemybullet.y = enemy.y+24;
+bool warning(Plane playerx,Plane enemyx){
+    enemyx.x-=100;
+    enemyx.y-=100;
+    enemyx.w+=200;
+    enemyx.h+=200;
+    if(collision(playerx,enemyx)){
+        return true;
+    }
+    return false;
+}
+void enemyfire(bool firing){
+    firing=warning(player,enemy);
+    int bulletspeedx;
+    int bulletspeedy;
+  if (enemybullet.health == 0&&firing) {
+        enemybullet.x = enemy.x+enemy.w/2;
+        enemybullet.y = enemy.y+enemy.h/2;
         enemybullet.health = 1;
     }
-    enemybullet.x -=bulletspeed ;
-    if (enemybullet.x <0||collision(enemybullet,player)) {
+    bulletspeedx=(player.x-enemy.x)/div_bullet;
+    bulletspeedy=(player.y-enemy.y)/div_bullet;
+
+    enemybullet.x +=bulletspeedx;
+    enemybullet.y +=bulletspeedy;
+    if (enemybullet.x <0||collision(enemybullet,player)||enemybullet.x>SCREEN_WIDTH-enemybullet.w||enemybullet.y<0||enemybullet.y>SCREEN_HEIGHT-enemybullet.h) {
         enemybullet.health = 0;
     }
     if (enemybullet.health > 0) {
         blit(enemybullet.texture, enemybullet.x, enemybullet.y);
     }
 }
-void enemy1fire(int bulletspeed){
-    if (enemybullet1.health == 0) {
-        enemybullet1.x = enemy1.x;
-        enemybullet1.y = enemy1.y+24;
+void enemy1fire(bool firing){
+    firing=warning(player,enemy1);
+    int bulletspeedx;
+    int bulletspeedy;
+    if (enemybullet1.health == 0&&firing) {
+        enemybullet1.x = enemy1.x+enemy1.w/2;
+        enemybullet1.y = enemy1.y+enemy1.h/2;
         enemybullet1.health = 1;
     }
-    enemybullet1.x -=bulletspeed ;
-    if (enemybullet1.x <0||collision(enemybullet1,player)) {
+    bulletspeedx=(player.x-enemy1.x)/div_bullet;
+    bulletspeedy=(player.y-enemy1.y)/div_bullet;
+
+    enemybullet1.x +=bulletspeedx;
+    enemybullet1.y +=bulletspeedy;
+    if (enemybullet1.x <0||collision(enemybullet1,player)||enemybullet1.x>SCREEN_WIDTH-enemybullet1.w||enemybullet1.y<0||enemybullet1.y>SCREEN_HEIGHT-enemybullet1.h) {
         enemybullet1.health = 0;
     }
     if (enemybullet1.health > 0) {
         blit(enemybullet1.texture, enemybullet1.x, enemybullet1.y);
     }
 }
-void enemy2fire(int bulletspeed){
-    if (enemybullet2.health == 0) {
-        enemybullet2.x = enemy2.x;
-        enemybullet2.y = enemy2.y+24;
+void enemy2fire(bool firing){
+    firing=warning(player,enemy2);
+    int bulletspeedx;
+    int bulletspeedy;
+    if (enemybullet2.health == 0&&firing) {
+        enemybullet2.x = enemy2.x+enemy2.w/2;
+        enemybullet2.y = enemy2.y+enemy2.h/2;
         enemybullet2.health = 1;
     }
-    enemybullet2.x -=bulletspeed ;
-    if (enemybullet2.x <0||collision(enemybullet2,player)) {
+    bulletspeedx=(player.x-enemy2.x)/div_bullet;
+    bulletspeedy=(player.y-enemy2.y)/div_bullet ;
+
+    enemybullet2.x +=bulletspeedx;
+    enemybullet2.y +=bulletspeedy;
+    if (enemybullet2.x <0||collision(enemybullet2,player)||enemybullet2.x>SCREEN_WIDTH-enemybullet2.w||enemybullet2.y<0||enemybullet2.y>SCREEN_HEIGHT-enemybullet2.h) {
         enemybullet2.health = 0;
     }
     if (enemybullet2.health > 0) {
         blit(enemybullet2.texture, enemybullet2.x, enemybullet2.y);
     }
 }
+void crash(){
+    if(collision(player,enemy)||collision(player,enemy1)||collision(player,enemy2)){
+        player.health=0;
+    }
+}
+void enemymove(Plane &enemyx){
+    enemyx.x+=(player.x-enemyx.x)/div_enemy;
+    enemyx.y+=(player.y-enemyx.y)/div_enemy;
+        if (enemyx.x <0||enemyx.x>SCREEN_WIDTH-enemyx.w||enemyx.y<0||enemyx.y>SCREEN_HEIGHT-enemyx.h) {
+        spawnenemy(enemyx);
+    }
+}
 void playermove(){
-    if(player.x>SCREEN_WIDTH/2-70) {
-                player.x=SCREEN_WIDTH/2-70;
-            }
             if(player.x<0) {
                 player.x=0;
             }
-            if(player.y<20) {
-                player.y=20;
+            if(player.y<10) {
+                player.y=10;
             }
-            if(player.y>SCREEN_HEIGHT-player.h-20) {
-                player.y=SCREEN_HEIGHT-player.h-20;
+            if(player.y>SCREEN_HEIGHT-player.h) {
+                player.y=SCREEN_HEIGHT-player.h;
             }
 
             if (app.up) {
@@ -352,7 +457,6 @@ void gameover(){
     blit(g2,SCREEN_WIDTH/2-150,SCREEN_HEIGHT/2-10);
     blit(g3,SCREEN_WIDTH/2-150,SCREEN_HEIGHT/2-100);
 }
-
 int main(int argc,char* argv[]) {
     IMG_Init(IMG_INIT_PNG);
     TTF_Init();
@@ -360,30 +464,55 @@ int main(int argc,char* argv[]) {
     Mix_OpenAudio(MIX_DEFAULT_FREQUENCY*2,MIX_DEFAULT_FORMAT,MIX_DEFAULT_CHANNELS,2048);
     Mix_Music *bgm= Mix_LoadMUS("bgm.mp3");
     initSDL(window,renderer,WINDOW_TITLE,SCREEN_WIDTH,SCREEN_HEIGHT);
-    player.x = 100;
-    player.y = 100;
     player.texture = loadTexture("player.png");
     bullet.texture = loadTexture("bullet.png");
     enemy.texture= loadTexture("enemy.png");
     enemy1.texture= loadTexture("enemy.png");
     enemy2.texture= loadTexture("enemy.png");
-
     enemybullet.texture=loadTexture("enemybullet.1.png");
     enemybullet1.texture=loadTexture("enemybullet.1.png");
     enemybullet2.texture=loadTexture("enemybullet.1.png");
     SDL_Texture *backgr=loadTexture("backgrnew.png");
     SDL_Texture* explos= loadTexture("explosion.png");
+    bool firing=false;
+    gameStream.open("input.txt",ios::in);
+    int key;gameStream>>key;
+    gameStream.close();
+//    while(!gameStream.eof()){
+//        gameStream>>key;
+//    }
+
+    if(key==0){
+    player.x = 100;
+    player.y = 100;
     spawnenemy(enemy);
     spawnenemy(enemy1);
     spawnenemy(enemy2);
-    Mix_PlayMusic(bgm,-1);
+    }
+    if(key==1){
+            gameStream.open("input.txt",ios::in);
+
+            if(gameStream.is_open()){
+                gameStream>>key;
+                gameStream>>enemy.x>>enemy.y;
+                gameStream>>enemy1.x>>enemy1.y;
+                gameStream>>enemy2.x>>enemy2.y;
+                gameStream>>player.x>>player.y>>player.health;
+                gameStream>>damage>>div_bullet>>div_enemy;
+                gameStream>>score>>highscore;
+                gameStream.close();
+            }
+            else return 404;
+            enter=true;
+    }
+
+    //Mix_PlayMusic(bgm,-1);
     while(gamerunning) {
-        doInput();
+        dogameStream();
         if(enter) {
             Screen();
             blit(backgr,0,0);
             screenscore();
-            logic();
             setpos(player);
             setpos(enemy);
             setpos(enemy1);
@@ -425,21 +554,42 @@ int main(int argc,char* argv[]) {
             blit(enemy.texture,enemy.x,enemy.y);
             blit(enemy1.texture,enemy1.x,enemy1.y);
             blit(enemy2.texture,enemy2.x,enemy2.y);
-            enemyfire(bulletspeed);
-            enemy1fire(bulletspeed);
-            enemy2fire(bulletspeed);
+            enemy1fire(firing);
+            enemy2fire(firing);
+            crash();
             playermove();
+            enemyfire(firing);
+            enemymove(enemy);
+            enemymove(enemy1);
+            enemymove(enemy2);
+            if(collision(enemy1,enemy2)){
+                spawnenemy(enemy1);
+
+                blit(explos,enemy1.x,enemy1.y);
+            }
+             if(collision(enemy,enemy2)){
+                spawnenemy(enemy);
+
+                blit(explos,enemy.x,enemy.y);
+            }
+             if(collision(enemy1,enemy)){
+                spawnenemy(enemy1);
+
+                blit(explos,enemy1.x,enemy1.y);
+            }
             string s="Health:";
             s+=to_string(player.health);
             SDL_Texture* health=getTextTexture(s.c_str());
             blit(health,SCREEN_WIDTH/2,10);
             blit(player.texture,player.x,player.y);
+            dobullet();
             if(player.health<=0){
+//                blit(explos,player.x,player.y);
+                SDL_RenderClear(renderer);
                 blit(backgr,0,0);
                 app.fire=0;
                 gameover();
             }
-            dobullet();
             upScence();
             SDL_Delay(16);
         } else {
